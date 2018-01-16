@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46fd8f46-5baa-4a3c-8867-1c9509fd4e1d" name="默认" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/craw.php" afterPath="$PROJECT_DIR$/craw.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/readme.md" afterPath="$PROJECT_DIR$/readme.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,26 +17,14 @@
       <file leaf-file-name="craw.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/craw.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2369">
-              <caret line="169" column="21" lean-forward="false" selection-start-line="169" selection-start-column="21" selection-end-line="169" selection-end-column="21" />
+            <state relative-caret-position="506">
+              <caret line="22" column="24" lean-forward="true" selection-start-line="22" selection-start-column="24" selection-end-line="22" selection-end-column="119" />
               <folding>
                 <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
-                <marker date="1515998017761" expanded="true" signature="1440:1485" ph="select * fro... dede_quanquan" />
-                <marker date="1515998017761" expanded="true" signature="3865:3968" ph="insert into dede_article... " />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="mood.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../mood/mood.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="575">
-              <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="32" selection-end-column="45" />
-              <folding>
-                <marker date="1505370781701" expanded="true" signature="574:610" ph="select 1 fro... mood" />
-                <marker date="1505370781701" expanded="true" signature="704:761" ph="update mood " />
-                <marker date="1505370781701" expanded="true" signature="870:898" ph="select * fro... mood" />
+                <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+                <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+                <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+                <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
               </folding>
             </state>
           </provider>
@@ -61,6 +47,14 @@
       <find>http://mp.weixin.qq.com/s?src=3&amp;timestamp=1515926940&amp;ver=1&amp;signature=Zcr9FdALzIG3s1fDzbptLuFW6r*tauYy5LsWsijQ-9IqHX5zbBkGnnlDGw3-0maZX778L0gTJNnOLMetRLOcBWrL1ZCvXSdWsybH7EyULsVaRTPEdqs-bBOw9ip7RltDQ7FBXZAm7K6Fgh0Mhq9shA==</find>
       <find>sprintf</find>
       <find>strpos</find>
+      <find>strr_replace</find>
+      <find>str_replace</find>
+      <find>file_get_contents</find>
+      <find>get</find>
+      <find>中产移民美国</find>
+      <find>get_c</find>
+      <find>file_get</find>
+      <find>echo_log</find>
     </findStrings>
     <replaceStrings>
       <replace>$content</replace>
@@ -78,8 +72,9 @@
         <option value="$PROJECT_DIR$/data.php" />
         <option value="$PROJECT_DIR$/../mood/sql.php" />
         <option value="$PROJECT_DIR$/sql.php" />
-        <option value="$PROJECT_DIR$/../test.php" />
         <option value="D:/AMP/mysql/my.ini" />
+        <option value="$PROJECT_DIR$/../test.php" />
+        <option value="D:/AMP/nginx/conf/vhost/localhost.conf" />
         <option value="$PROJECT_DIR$/craw.php" />
       </list>
     </option>
@@ -91,7 +86,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
     <option name="width" value="1604" />
@@ -113,6 +108,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -122,20 +119,23 @@
             </path>
             <path>
               <item name="page" type="b2602c69:ProjectViewProjectNode" />
+              <item name="page" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="html" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="page" type="b2602c69:ProjectViewProjectNode" />
               <item name="外部库" type="bcb0276e:PhpExternalLibrariesNodePatcher$PatchedExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="D:/AMP/www/zuofan.cn" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../water_rate" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -166,22 +166,24 @@
       <workItem from="1515720725801" duration="24384000" />
       <workItem from="1515756739274" duration="5207000" />
       <workItem from="1515841910652" duration="10610000" />
-      <workItem from="1515980044019" duration="12736000" />
+      <workItem from="1515980044019" duration="17660000" />
+      <workItem from="1516010266359" duration="1145000" />
+      <workItem from="1516065751250" duration="18411000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54606000" />
+    <option name="totallyTimeSpent" value="79086000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32908705" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1108742" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -234,8 +236,78 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
-            <marker date="1515998017761" expanded="true" signature="1440:1485" ph="select * fro... dede_quanquan" />
-            <marker date="1515998017761" expanded="true" signature="3865:3968" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../mood/mood.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="713">
+          <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="32" selection-end-column="45" />
+          <folding>
+            <marker date="1505370781701" expanded="true" signature="574:610" ph="select 1 fro... mood" />
+            <marker date="1505370781701" expanded="true" signature="704:761" ph="update mood " />
+            <marker date="1505370781701" expanded="true" signature="870:898" ph="select * fro... mood" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../test.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="6" column="26" lean-forward="false" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/craw.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
+            <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../mood/mood.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="713">
+          <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="32" selection-end-column="45" />
+          <folding>
+            <marker date="1505370781701" expanded="true" signature="574:610" ph="select 1 fro... mood" />
+            <marker date="1505370781701" expanded="true" signature="704:761" ph="update mood " />
+            <marker date="1505370781701" expanded="true" signature="870:898" ph="select * fro... mood" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../test.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="6" column="26" lean-forward="false" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/craw.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
+            <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
           </folding>
         </state>
       </provider>
@@ -260,7 +332,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="7084">
           <caret line="308" column="33" lean-forward="false" selection-start-line="308" selection-start-column="19" selection-end-line="308" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -270,8 +341,10 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
-            <marker date="1515998017761" expanded="true" signature="1440:1485" ph="select * fro... dede_quanquan" />
-            <marker date="1515998017761" expanded="true" signature="3865:3968" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
           </folding>
         </state>
       </provider>
@@ -280,7 +353,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="7084">
           <caret line="308" column="33" lean-forward="false" selection-start-line="308" selection-start-column="19" selection-end-line="308" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -290,8 +362,10 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
-            <marker date="1515998017761" expanded="true" signature="1440:1485" ph="select * fro... dede_quanquan" />
-            <marker date="1515998017761" expanded="true" signature="3865:3968" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
           </folding>
         </state>
       </provider>
@@ -344,7 +418,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="7084">
           <caret line="308" column="33" lean-forward="false" selection-start-line="308" selection-start-column="19" selection-end-line="308" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -356,25 +429,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../test.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="1" column="12" lean-forward="false" selection-start-line="1" selection-start-column="12" selection-end-line="1" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/AMP/mysql/my.ini">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="115">
           <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../test.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="6" column="26" lean-forward="false" selection-start-line="6" selection-start-column="26" selection-end-line="6" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../mood/mood.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="575">
+        <state relative-caret-position="713">
           <caret line="31" column="0" lean-forward="false" selection-start-line="31" selection-start-column="0" selection-end-line="32" selection-end-column="45" />
           <folding>
             <marker date="1505370781701" expanded="true" signature="574:610" ph="select 1 fro... mood" />
@@ -384,14 +456,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/html/1.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="71" column="28" lean-forward="false" selection-start-line="71" selection-start-column="28" selection-end-line="71" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/AMP/nginx/conf/vhost/localhost.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="640">
+          <caret line="84" column="8" lean-forward="false" selection-start-line="84" selection-start-column="8" selection-end-line="84" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/craw.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2369">
-          <caret line="169" column="21" lean-forward="false" selection-start-line="169" selection-start-column="21" selection-end-line="169" selection-end-column="21" />
+        <state relative-caret-position="506">
+          <caret line="22" column="24" lean-forward="true" selection-start-line="22" selection-start-column="24" selection-end-line="22" selection-end-column="119" />
           <folding>
             <element signature="n#down#0;n#craw#0;n#!!top" expanded="false" />
-            <marker date="1515998017761" expanded="true" signature="1440:1485" ph="select * fro... dede_quanquan" />
-            <marker date="1515998017761" expanded="true" signature="3865:3968" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="1511:1549" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="1511:1558" ph="select * fro... dede_quanquan" />
+            <marker date="1516091807899" expanded="true" signature="3917:4020" ph="insert into dede_article... " />
+            <marker date="1516091807899" expanded="true" signature="10545:10597" ph="select id fr... dede_article" />
           </folding>
         </state>
       </provider>
