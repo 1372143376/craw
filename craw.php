@@ -24,8 +24,8 @@ class craw
 	//private $main_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2';
 
 	//分页
-	private $start = 11;
-	private $end = 69;
+	private $start = 1;
+	private $end = 10;
 
 	//专题的id
 	private $id = 1;
@@ -78,6 +78,7 @@ class craw
 		//run
 		$results = $this->pdo->query("select * from dede_quanquan  where id=$this->id");
 		$row = $results->fetch(PDO::FETCH_ASSOC);
+		//sleep(rand(1,8));
 		$this->index($row['name']);
 
 	}
@@ -90,7 +91,7 @@ class craw
 		for ($i = $this->start; $i <= $this->end; $i++)
 		{
 			$cate_url = sprintf($this->key_url, $key, $i);
-			return $this->category($cate_url, $this->id);
+			$this->category($cate_url, $this->id);
 		}
 		//http://weixin.sogou.com/weixin?query=%E6%9D%B0%E5%9C%A3%E7%A7%BB%E6%B0%91&_sug_type_=&s_from=input&_sug_=n&type=2&page=5&ie=utf8
 	}
@@ -100,11 +101,13 @@ class craw
 	{
 		//curl获取不到
 		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
-		$content = file_get_contents($cate_url);
-		if(is_null($content))
-		{
-			return $this->echo_log();
-		}
+		$content = $this->getUrlContent($cate_url, 2);
+		var_dump($content);
+		die;
+		/*	if(is_null($content))
+			{
+				return $this->echo_log();
+			}*/
 		//$content = file_get_contents('D:\test\page\html\1.html');
 		//匹配文章链接http://mp.weixin.qq.com/s?
 		///   /http:\/\/mp.weixin.qq.com\/s\?src=([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/i
@@ -159,11 +162,10 @@ class craw
 		{
 			$result = $this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
 			$last_id = $this->pdo->lastInsertId();
-			if ($last_id > ($this->id * $this->end * 10))
+			if ($last_id == (($this->id) * 100 - ($this->id + 2)))
 			{
 				$this->id = $this->id + 1;
 				$this->run();
-				die;
 			}
 		}
 		catch (PDOException $e)
@@ -172,7 +174,7 @@ class craw
 		}
 
 		//爬过的文章
-		echo $last_id . 'success----  ' . $url . "\n";
+		echo 'success----  ' . $url . "\n";
 	}
 
 
@@ -335,7 +337,7 @@ class craw
 
 	private function getUrlContent($url, $type = 1)
 	{
-		if ($type)
+		if ($type == 1)
 		{
 			$ch = curl_init();
 			$timeout = 5;
@@ -354,18 +356,52 @@ class craw
 			if (preg_match($regex4, $file1, $file2))
 			{
 				preg_match('/<div id="js_article".*?>.*?<script/ism', $file2[0], $file);
+				curl_close($ch);
 				return $file;
 			}
 			else
 			{
+				curl_close($ch);
 				return '0';
 			}
-			curl_close($ch);
+
 		}
 		else
 		{
-			$file = file_get_contents($url);
-			return $file;
+			$agent_id_array = ['104.224.176.239','47.91.226.157','104.224.176.239','104.224.176.239','155.94.228.241'];
+			$agent_id_key =rand(0,4);
+			$agent_id = $agent_id_array[$agent_id_key];
+			$post = '';
+			$autoFollow = 0;
+			$ch = curl_init();
+			$user_agent = 'Safari Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.73.11 (KHTML, like Gecko) Version/7.0.1 Safari/5
+        curl_setopt($ch, CURLOPT_USERAGENT, $user_agent)';
+			// 2. 设置选项，包括URL
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+				'X-FORWARDED-FOR:'.$agent_id,
+				'CLIENT-IP:'.$agent_id
+			]);  //构造IP
+			curl_setopt($ch, CURLOPT_REFERER, "http://www.baidu.com/");   //构造来路
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+			@curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1); // 使用自动跳转
+			if ($autoFollow)
+			{
+				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  //启动跳转链接
+				curl_setopt($ch, CURLOPT_AUTOREFERER, true);  //多级自动跳转
+			}
+			//
+			if ($post != '')
+			{
+				curl_setopt($ch, CURLOPT_POST, 1);//post提交方式
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+			}
+			// 3. 执行并获取HTML文档内容
+			$output = curl_exec($ch);
+			curl_close($ch);
+			return $output;
 		}
 	}
 
@@ -392,7 +428,11 @@ class craw
 	public function echo_log()
 	{
 		$id = $this->pdo->query("select id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
-		return ['最后插入的id' => $id['id'],'属于的分类' =>$this->id,'下次从多少页开始' => ceil($id['id']/10) + 1];
+		return [
+			'最后插入的id' => $id['id'],
+			'属于的分类' => $this->id,
+			'下次从多少页开始' => ceil($id['id'] / 10) + 1
+		];
 	}
 }
 
