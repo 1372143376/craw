@@ -161,7 +161,7 @@ class craw
 		{
 			$result = $this->pdo->exec("insert into yangsheng_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
 			$last_id = $this->pdo->lastInsertId();
-			if ($last_id == (($this->id) * 100 - $this->id -2))
+			if ($last_id == (($this->id) * 100 - $this->id * 3))
 			{
 				$this->id = $this->id + 1;
 				$this->run();

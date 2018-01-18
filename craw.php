@@ -28,7 +28,7 @@ class craw
 	private $end = 10;
 
 	//专题的id
-	private $id = 1;
+	private $id = 3;
 
 	//图片后缀
 	private $ext = [
@@ -102,8 +102,8 @@ class craw
 		//curl获取不到
 		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
 		$content = $this->getUrlContent($cate_url, 2);
-		var_dump($content);
-		die;
+		/*var_dump($content);
+		die;*/
 		/*	if(is_null($content))
 			{
 				return $this->echo_log();
@@ -162,7 +162,7 @@ class craw
 		{
 			$result = $this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
 			$last_id = $this->pdo->lastInsertId();
-			if ($last_id == (($this->id) * 100 - ($this->id + 2)))
+			if ($last_id == (($this->id) * 100 - $this->id * 3))
 			{
 				$this->id = $this->id + 1;
 				$this->run();
