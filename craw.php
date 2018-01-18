@@ -28,7 +28,7 @@ class craw
 	private $end = 10;
 
 	//专题的id
-	private $id = 3;
+	private $id = 15;
 
 	//图片后缀
 	private $ext = [
@@ -207,7 +207,8 @@ class craw
 				}*/
 			//$v = str_replace('[/img]', '', $v);
 			$filename = explode('=', $v);
-			$current = file_get_contents($v);
+			//$current = file_get_contents($v);
+			$current = $this->getUrlContent($v,2);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
@@ -368,8 +369,14 @@ class craw
 		}
 		else
 		{
-			$agent_id_array = ['104.224.176.239','47.91.226.157','104.224.176.239','104.224.176.239','155.94.228.241'];
-			$agent_id_key =rand(0,4);
+			$agent_id_array = [
+				'104.224.176.239',
+				'47.91.226.157',
+				'104.224.176.239',
+				'104.224.176.239',
+				'155.94.228.241'
+			];
+			$agent_id_key = rand(0, 4);
 			$agent_id = $agent_id_array[$agent_id_key];
 			$post = '';
 			$autoFollow = 0;
@@ -381,12 +388,12 @@ class craw
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
-				'X-FORWARDED-FOR:'.$agent_id,
-				'CLIENT-IP:'.$agent_id
+				'X-FORWARDED-FOR:' . $agent_id,
+				'CLIENT-IP:' . $agent_id
 			]);  //构造IP
 			curl_setopt($ch, CURLOPT_REFERER, "http://www.baidu.com/");   //构造来路
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-			@curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1); // 使用自动跳转
+			@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
 			if ($autoFollow)
 			{
 				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  //启动跳转链接
