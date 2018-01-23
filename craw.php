@@ -27,8 +27,8 @@ class craw
 	private $start = 1;
 	private $end = 10;
 
-	//专题的id
-	private $id = 15;
+	//专题的id //36
+	private $id = 3;
 
 	//图片后缀
 	private $ext = [
@@ -91,23 +91,31 @@ class craw
 		for ($i = $this->start; $i <= $this->end; $i++)
 		{
 			$cate_url = sprintf($this->key_url, $key, $i);
-			$this->category($cate_url, $this->id);
+			$this->category($cate_url, $this->id,$i);
 		}
 		//http://weixin.sogou.com/weixin?query=%E6%9D%B0%E5%9C%A3%E7%A7%BB%E6%B0%91&_sug_type_=&s_from=input&_sug_=n&type=2&page=5&ie=utf8
 	}
 
 	//专题
-	public function category($cate_url, $cate_id)
+	public function category($cate_url, $cate_id,$page)
 	{
 		//curl获取不到
 		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
 		$content = $this->getUrlContent($cate_url, 2);
-		/*var_dump($content);
-		die;*/
+
+		//如果是最后一页返回null
 		/*	if(is_null($content))
 			{
 				return $this->echo_log();
 			}*/
+		if(is_null($content) && $page == $this->end)
+		{
+			$this->run();
+		}
+		if(is_null($content))
+		{
+			echo 'stop-----....';
+		}
 		//$content = file_get_contents('D:\test\page\html\1.html');
 		//匹配文章链接http://mp.weixin.qq.com/s?
 		///   /http:\/\/mp.weixin.qq.com\/s\?src=([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/i
@@ -152,7 +160,7 @@ class craw
 		$content = $this->strr_replace($content);
 		//return $content;die;
 		//下载图片 body local_img
-		list($body, $local_img) = $this->download_img($content);
+		list($body, $local_img) = $this->download_img($content,$url);
 		//$body = preg_replace('/[img]htt.*?[/img]/','',$body);
 		$title = explode('[/title]', $body)[0];
 		$title = str_replace('[title]', '', $title);
@@ -162,7 +170,7 @@ class craw
 		{
 			$result = $this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
 			$last_id = $this->pdo->lastInsertId();
-			if ($last_id == (($this->id) * 100 - $this->id * 3))
+			if ($last_id == ($this->id * 200 - $this->id))
 			{
 				$this->id = $this->id + 1;
 				$this->run();
@@ -180,7 +188,7 @@ class craw
 
 //下载图片
 
-	private function download_img($content)
+	private function download_img($content,$article_url)
 	{
 		//匹配有效图片地址
 		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=]*(jpg|gif|png|jpeg|\?)/i', $content, $data);
@@ -208,7 +216,7 @@ class craw
 			//$v = str_replace('[/img]', '', $v);
 			$filename = explode('=', $v);
 			//$current = file_get_contents($v);
-			$current = $this->getUrlContent($v,2);
+			$current = $this->getUrlContent($v,2,$article_url);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
@@ -336,7 +344,7 @@ class craw
 
 	}
 
-	private function getUrlContent($url, $type = 1)
+	private function getUrlContent($url, $type = 1,$article_url= '')
 	{
 		if ($type == 1)
 		{
@@ -390,8 +398,11 @@ class craw
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
 				'X-FORWARDED-FOR:' . $agent_id,
 				'CLIENT-IP:' . $agent_id
-			]);  //构造IP
-			curl_setopt($ch, CURLOPT_REFERER, "http://www.baidu.com/");   //构造来路
+			]);
+
+
+			//针对图片的来路，百度未收录，得从原文链接下载
+			curl_setopt($ch, CURLOPT_REFERER, $article_url);   //构造来路
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 			@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
 			if ($autoFollow)
