@@ -1,8 +1,9 @@
 <?php
+set_time_limit(0);
 $craw = new craw();
-
+print_r($craw->echo_log());
 var_dump($craw->run());
-//var_dump($craw->echo_log());
+
 die;
 
 
@@ -28,7 +29,7 @@ class craw
 	private $end = 10;
 
 	//专题的id //36
-	private $id = 3;
+	private $id = 15;
 
 	//图片后缀
 	private $ext = [
@@ -45,7 +46,7 @@ class craw
 
 	public function __construct()
 	{
-
+		set_time_limit(0);
 		//链接数据库
 		$db_user = "root";
 		$db_pass = "";
@@ -449,7 +450,7 @@ class craw
 		return [
 			'最后插入的id' => $id['id'],
 			'属于的分类' => $this->id,
-			'下次从多少页开始' => ceil($id['id'] / 10) + 1
+			'下次专题id' => $id['id'] + 1
 		];
 	}
 }
