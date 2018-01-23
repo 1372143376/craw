@@ -1,9 +1,6 @@
 <?php
 set_time_limit(0);
 $craw = new craw();
-print_r($craw->echo_log());
-var_dump($craw->run());
-
 die;
 
 
@@ -12,10 +9,10 @@ class craw
 {
 
 	//根路径
-	private $baseDir = 'D:/test/page/';
+	private $baseDir = 'star';
 
 	//图片目录
-	private $img_Dir = 'D:/test/page/uploads/';
+	private $img_Dir = 'D:/test/page/star/';
 
 	//关键字
 	//private $key = '杰圣移民';
@@ -29,7 +26,7 @@ class craw
 	private $end = 10;
 
 	//专题的id //36
-	private $id = 16;
+	private $id ;
 
 	//图片后缀
 	private $ext = [
@@ -66,9 +63,28 @@ class craw
 		{
 			echo $e->getMessage();
 		}
+
+		for ($id = 1; $id <= 5; $id++)
+		{
+			$results = $this->pdo->query("select * from star_cate  where id=$id and is_done = 0");
+			$row = $results->fetch(PDO::FETCH_ASSOC);
+			$this->pdo->exec("update star_cate set is_done = 1 where id = $id");
+			if (empty($row))
+			{
+				continue;
+			}
+			else
+			{
+				print_r($this->echo_log());
+				$this->id = $row['id'];
+				$this->run($row['name']);
+				sleep(3600);
+			}
+		}
+
 	}
 
-	public function run()
+	public function run($name)
 	{
 		set_time_limit(0);
 		if ($this->id > 39)
@@ -77,10 +93,10 @@ class craw
 			die();
 		}
 		//run
-		$results = $this->pdo->query("select * from dede_quanquan  where id=$this->id");
-		$row = $results->fetch(PDO::FETCH_ASSOC);
+		//$results = $this->pdo->query("select * from star_cate  where id=$id");
+		//$row = $results->fetch(PDO::FETCH_ASSOC);
 		//sleep(rand(1,8));
-		$this->index($row['name']);
+		$this->index($name);
 
 	}
 
@@ -92,31 +108,18 @@ class craw
 		for ($i = $this->start; $i <= $this->end; $i++)
 		{
 			$cate_url = sprintf($this->key_url, $key, $i);
-			$this->category($cate_url, $this->id,$i);
+			$this->category($cate_url, $this->id, $i);
 		}
 		//http://weixin.sogou.com/weixin?query=%E6%9D%B0%E5%9C%A3%E7%A7%BB%E6%B0%91&_sug_type_=&s_from=input&_sug_=n&type=2&page=5&ie=utf8
 	}
 
 	//专题
-	public function category($cate_url, $cate_id,$page)
+	public function category($cate_url, $cate_id, $page)
 	{
 		//curl获取不到
 		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
 		$content = $this->getUrlContent($cate_url, 2);
 
-		//如果是最后一页返回null
-		/*	if(is_null($content))
-			{
-				return $this->echo_log();
-			}*/
-		if(is_null($content) && $page == $this->end)
-		{
-			$this->run();
-		}
-		if(is_null($content))
-		{
-			echo 'stop-----....';
-		}
 		//$content = file_get_contents('D:\test\page\html\1.html');
 		//匹配文章链接http://mp.weixin.qq.com/s?
 		///   /http:\/\/mp.weixin.qq.com\/s\?src=([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/i
@@ -161,7 +164,7 @@ class craw
 		$content = $this->strr_replace($content);
 		//return $content;die;
 		//下载图片 body local_img
-		list($body, $local_img) = $this->download_img($content,$url);
+		list($body, $local_img) = $this->download_img($content, $url);
 		//$body = preg_replace('/[img]htt.*?[/img]/','',$body);
 		$title = explode('[/title]', $body)[0];
 		$title = str_replace('[title]', '', $title);
@@ -169,13 +172,7 @@ class craw
 		$title = str_replace('   ', '', $title);
 		try
 		{
-			$result = $this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
-			$last_id = $this->pdo->lastInsertId();
-			if ($last_id == ($this->id * 200 - $this->id))
-			{
-				$this->id = $this->id + 1;
-				$this->run();
-			}
+			$result = $this->pdo->exec("insert into star_article (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
 		}
 		catch (PDOException $e)
 		{
@@ -189,7 +186,7 @@ class craw
 
 //下载图片
 
-	private function download_img($content,$article_url)
+	private function download_img($content, $article_url)
 	{
 		//匹配有效图片地址
 		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=]*(jpg|gif|png|jpeg|\?)/i', $content, $data);
@@ -199,10 +196,9 @@ class craw
 			return [];
 		}
 		//图片保存路径
-		$img_Dir = $this->baseDir . 'uploads/';
 		if (!file_exists($this->img_Dir))
 		{
-			mkdir($img_Dir, 0777, true);
+			mkdir($this->img_Dir, 0777, true);
 		}
 
 		//local_img 字段 json
@@ -217,7 +213,7 @@ class craw
 			//$v = str_replace('[/img]', '', $v);
 			$filename = explode('=', $v);
 			//$current = file_get_contents($v);
-			$current = $this->getUrlContent($v,2,$article_url);
+			$current = $this->getUrlContent($v, 2, $article_url);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
@@ -266,7 +262,7 @@ class craw
 		}
 		$dst_filename = $small_dir . '/' . $md5 . '.' . $ext;
 		//替换地址
-		$new_filename = '/uploads/' . $dir1 . '/' . $dir2 . '/' . $md5 . '.' . $ext;
+		$new_filename = $this->baseDir . $dir1 . '/' . $dir2 . '/' . $md5 . '.' . $ext;
 		return [
 			$dst_filename,
 			$new_filename
@@ -345,7 +341,7 @@ class craw
 
 	}
 
-	private function getUrlContent($url, $type = 1,$article_url= '')
+	private function getUrlContent($url, $type = 1, $article_url = '')
 	{
 		if ($type == 1)
 		{
@@ -446,7 +442,7 @@ class craw
 
 	public function echo_log()
 	{
-		$id = $this->pdo->query("select id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
+		$id = $this->pdo->query("select id from star_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
 			'最后插入的id' => $id['id'],
 			'属于的分类' => $this->id,
