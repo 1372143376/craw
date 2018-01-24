@@ -1,9 +1,7 @@
 <?php
 set_time_limit(0);
-$craw = new craw();
-print_r($craw->echo_log());
-var_dump($craw->run());
 
+$craw = new craw();
 die;
 
 
@@ -29,7 +27,7 @@ class craw
 	private $end = 10;
 
 	//专题的id //36
-	private $id = 16;
+	private $id ;
 
 	//图片后缀
 	private $ext = [
@@ -66,21 +64,32 @@ class craw
 		{
 			echo $e->getMessage();
 		}
+
+		for ($id = 17; $id <= 39; $id++)
+		{
+			$results = $this->pdo->query("select * from dede_quanquan  where id=$id and is_done = 0");
+			$row = $results->fetch(PDO::FETCH_ASSOC);
+			$this->pdo->exec("update dede_quanquan set is_done = 1 where id = $id");
+			if (empty($row))
+			{
+				continue;
+			}
+			else
+			{
+				print_r($this->echo_log());
+				$this->id = $row['id'];
+				$this->run($row['name']);
+				//间隔半小时
+				sleep(1800);
+			}
+		}
 	}
 
-	public function run()
+	public function run($name)
 	{
 		set_time_limit(0);
-		if ($this->id > 39)
-		{
-			echo 'suc';
-			die();
-		}
 		//run
-		$results = $this->pdo->query("select * from dede_quanquan  where id=$this->id");
-		$row = $results->fetch(PDO::FETCH_ASSOC);
-		//sleep(rand(1,8));
-		$this->index($row['name']);
+		$this->index($name);
 
 	}
 
@@ -103,20 +112,6 @@ class craw
 		//curl获取不到
 		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
 		$content = $this->getUrlContent($cate_url, 2);
-
-		//如果是最后一页返回null
-		/*	if(is_null($content))
-			{
-				return $this->echo_log();
-			}*/
-		if(is_null($content) && $page == $this->end)
-		{
-			$this->run();
-		}
-		if(is_null($content))
-		{
-			echo 'stop-----....';
-		}
 		//$content = file_get_contents('D:\test\page\html\1.html');
 		//匹配文章链接http://mp.weixin.qq.com/s?
 		///   /http:\/\/mp.weixin.qq.com\/s\?src=([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/i
@@ -170,12 +165,6 @@ class craw
 		try
 		{
 			$result = $this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
-			$last_id = $this->pdo->lastInsertId();
-			if ($last_id == ($this->id * 200 - $this->id))
-			{
-				$this->id = $this->id + 1;
-				$this->run();
-			}
 		}
 		catch (PDOException $e)
 		{
@@ -216,16 +205,15 @@ class craw
 				}*/
 			//$v = str_replace('[/img]', '', $v);
 			$filename = explode('=', $v);
-			//$current = file_get_contents($v);
-			$current = $this->getUrlContent($v,2,$article_url);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
 			}
 			else
 			{
-				$ext = 'jpg';
+				continue;
 			}
+			$current = $this->getUrlContent($v,2,$article_url);
 			//新图片地址
 			list($dst_filename, $new_filename) = $this->md5_filename(md5($v), $ext);
 			//图片的字符串
@@ -448,9 +436,8 @@ class craw
 	{
 		$id = $this->pdo->query("select id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
-			'最后插入的id' => $id['id'],
-			'属于的分类' => $this->id,
-			'下次专题id' => $id['id'] + 1
+			'最一次插入的id' => $id['id'],
+			'属于的分类' => $id['cate_id'],
 		];
 	}
 }
