@@ -18,7 +18,8 @@ class craw
 	//图片目录
 	private $img_Dir = 'D:/test/page/star/';
 
-
+	//页面类型，1 、img_md5 /// 保存单张图片 2、local_img ///json保存多张图片
+	private $page_style = 1;
 	//关键字搜索 专题页  加分页%u
 	private $key_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2&page=%u&ie=utf8';
 	//private $main_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2';
@@ -35,7 +36,8 @@ class craw
 		'jpg',
 		'png',
 		'jpeg',
-		'gif'
+		'gif',
+		'webp'
 	];
 
 	private $pdo;
@@ -66,7 +68,7 @@ class craw
 			echo $e->getMessage();
 		}
 
-		for ($id = 1; $id <= 2; $id++)
+		for ($id = 1; $id <= 81; $id++)
 		{
 			$results = $this->pdo->query("select * from star_cate  where id=$id and is_done = 0");
 			$row = $results->fetch(PDO::FETCH_ASSOC);
@@ -78,18 +80,21 @@ class craw
 			else
 			{
 				print_r($this->echo_log());
+
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//执行间隔的时间
-				sleep(10);
+				echo "/n".' wait for 60 mins....';
+				sleep(3600);
 			}
 		}
 
 	}
 
 	//启动
+
 	/**
-	 * @param $name  关键字
+	 * @param $name string  搜索的关键字
 	 */
 	public function run($name)
 	{
@@ -106,8 +111,8 @@ class craw
 	//分析分页专题
 
 	/**
-	 * @param $cate_url
-	 * @param $cate_id
+	 * @param $cate_url string 专题页面链接
+	 * @param $cate_id    int 关键词的分类id
 	 * @return array
 	 */
 	public function category($cate_url, $cate_id)
@@ -118,12 +123,34 @@ class craw
 		{
 			return [];
 		}
-		//return $data[0];
+
+		if($this->page_style == 1)
+		{
+			$this->page_style_1($data[0], $cate_id, $cate_url);
+		}
+
+		if($this->page_style == 2)
+		{
+			$this->page_style_2($data[0], $cate_id, $cate_url);
+		}
+
+	}
+
+	//针对不同页面,不同采集方式
+
+	/**
+	 * @param array $data 匹配的链接
+	 * @param int $cate_id 关键词的分类id
+	 * @param string $cate_url 专题页面的地址
+	 */
+	private function page_style_1($data, $cate_id, $cate_url)
+	{
 		$new_data = [];
+		$herf = [];
 
 		//排除三张首图的
 		$n = 0;
-		foreach ($data[0] as $k => $val)
+		foreach ($data as $k => $val)
 		{
 			if (strpos($val, 'span') > 0)
 			{
@@ -140,7 +167,6 @@ class craw
 			$new_data[$k] = $val;
 		}
 
-		$herf = [];
 		foreach ($new_data as $k => $val)
 		{
 			//筛选
@@ -150,7 +176,6 @@ class craw
 			}
 			preg_match('/href=\".*?\"/', $val, $herf['a']);
 			preg_match('/src=\".*?\"/', $val, $herf['img']);
-			//"href="http://mp.weixin.qq.com/s?src=3&amp;timestamp=1515926017&amp;ver=1&amp;signature=Zcr9FdALzIG3s1fDzbptLuFW6r*tauYy5LsWsijQ-9IqHX5zbBkGnnlDGw3-0maZX778L0gTJNnOLMetRLOcBWrL1ZCvXSdWsybH7EyULsVaRTPEdqs-bBOw9ip7RltDQIhSZWeEr4txBRvioZXN7A==""
 			$herf['a'] = str_replace('href="', '', $herf['a']);
 			//分析链接 有加盐  amp;
 			$herf['a'] = str_replace('amp;', '', $herf['a']);
@@ -161,31 +186,66 @@ class craw
 			$herf['img'] = str_replace('amp;', '', $herf['img']);
 			$herf['img'] = rtrim($herf['img'][0], '"');
 
-
 			$this->article($herf['a'], $cate_id, $herf['img'], $cate_url);
 		}
 	}
 
+	/**
+	 * @param array $data 匹配的链接
+	 * @param int $cate_id 关键词的分类id
+	 * @param string $cate_url 文章页面的地址
+	 */
+	private function page_style_2($data, $cate_id, $cate_url)
+	{
+		$new_data = [];
+		foreach ($data as $k => $val)
+		{
+			//筛选
+			if (strpos($val, 'http://mp.weixin.qq.com/s?src=') === false)
+			{
+				continue;
+			}
+			$val = str_replace('href="', '', $val);
+			//分析链接 有加盐  amp;
+			$val = str_replace('amp;', '', $val);
+			//一维数组 文章的url
+			$new_data[$k] = rtrim($val, '"');
+		}
+		$new_data = array_unique($new_data);
+
+		foreach ($new_data as $article_url)
+		{
+			$this->article($article_url, $cate_id);
+		}
+	}
 	//文章页面，执行
-	//param 文章的链接  所属专题id
-	public function article($url, $cate_id, $img_url, $cate_url)
+
+	/**
+	 * @param $url string 文章链接
+	 * @param $cate_id int 关键字的分类id
+	 * @param string $img_url 分类页面单张图片
+	 * @param string $cate_url  单张图片的链接
+	 */
+	public function article($url, $cate_id, $img_url = '', $cate_url = '')
 	{
 
 		$content = $this->getUrlContent($url, 1);
 		$content = $this->strr_replace($content);
-		//return $content;die;
 		//下载图片 body local_img
 		list($body, $local_img) = $this->download_img($content, $url);
-		//栏目页的单张图片
-		$local_img_one = $this->download_one_img($img_url, $cate_url);
-		//$body = preg_replace('/[img]htt.*?[/img]/','',$body);
+		//页面类型为1情况
+		if ($this->page_style == 1)
+		{
+			$local_img = $this->download_one_img($img_url, $cate_url);
+		}
+
 		$title = explode('[/title]', $body)[0];
 		$title = str_replace('[title]', '', $title);
 		$title = str_replace('  ', '', $title);
 		$title = str_replace('   ', '', $title);
 		try
 		{
-			$result = $this->pdo->exec("insert into star_article (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img_one')");
+			$this->pdo->exec("insert into star_article (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
 		}
 		catch (PDOException $e)
 		{
@@ -193,11 +253,11 @@ class craw
 		}
 
 		//爬过的文章
-		echo 'success----  ' . $url . "\n";
+		echo 'success----  ' . $url . '/n';
 	}
 
 
-//下载图片
+//下载文章页面图片
 
 	private function download_img($content, $article_url)
 	{
@@ -213,7 +273,6 @@ class craw
 		{
 			mkdir($this->img_Dir, 0777, true);
 		}
-//var_dump($data[0]);die;
 		//local_img 字段 json
 		$local_img = [];
 		foreach ($data[0] as $k => $v)
@@ -245,7 +304,7 @@ class craw
 		];
 	}
 
-	//下载单张图片
+	//专题页面，下载单张图片
 
 	private function download_one_img($url, $category_url)
 	{
@@ -267,8 +326,13 @@ class craw
 		//返回单张图片新地址
 		return $new_filename;
 	}
-	//创建下载图片 目录
-	//img param $md5  ext后缀           return  /4d/45/dasfsdfsd5f5ds.jpg
+
+	//创建目录和下载图片
+	/**
+	 * @param $md5 string  图片名称
+	 * @param $ext
+	 * @return array
+	 */
 	private function md5_filename($md5, $ext)
 	{
 		$dir1 = $md5{0} . $md5{17};
@@ -301,7 +365,7 @@ class craw
 	//过滤字符串
 
 	/**
-	 * @param $content 需要过滤的字符串
+	 * @param $content string 需要过滤的字符串
 	 * @return mixed|string
 	 */
 	private function strr_replace($content)
@@ -355,9 +419,9 @@ class craw
 	//curl 下载
 
 	/**
-	 * @param $url	链接地址
-	 * @param int $type	1、是栏目页面的分割  2、针对图片或文章的来路，百度未收录，从原文链接下载
-	 * @param string $article_url	当type选择2,填写来路页面的链接
+	 * @param $url    string 链接地址
+	 * @param int $type 1、是栏目页面的分割  2、针对图片或文章的来路，百度未收录，从原文链接下载
+	 * @param string $article_url 当type选择2,填写来路页面的链接
 	 * @return mixed
 	 */
 	private function getUrlContent($url, $type = 1, $article_url = 'www.baidu.com')

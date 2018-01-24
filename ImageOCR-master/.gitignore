@@ -1,7 +1,0 @@
-old/
-.idea/
-vendor/
-composer.lock
-.*/
-info/
-test.php

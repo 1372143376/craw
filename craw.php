@@ -80,6 +80,7 @@ class craw
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//间隔半小时
+				echo '<br /> wait for 30 mins....';
 				sleep(1800);
 			}
 		}
