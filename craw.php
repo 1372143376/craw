@@ -27,7 +27,7 @@ class craw
 	private $end = 10;
 
 	//专题的id //36
-	private $id ;
+	private $id;
 
 	//图片后缀
 	private $ext = [
@@ -65,7 +65,7 @@ class craw
 			echo $e->getMessage();
 		}
 
-		for ($id = 17; $id <= 39; $id++)
+		for ($id = 1; $id <= 39; $id++)
 		{
 			$results = $this->pdo->query("select * from dede_quanquan  where id=$id and is_done = 0");
 			$row = $results->fetch(PDO::FETCH_ASSOC);
@@ -80,8 +80,8 @@ class craw
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//间隔半小时
-				echo '<br /> wait for 30 mins....';
-				sleep(1800);
+				echo ' wait for 30 mins....';
+				sleep(30);
 			}
 		}
 	}
@@ -102,13 +102,13 @@ class craw
 		for ($i = $this->start; $i <= $this->end; $i++)
 		{
 			$cate_url = sprintf($this->key_url, $key, $i);
-			$this->category($cate_url, $this->id,$i);
+			$this->category($cate_url, $this->id, $i);
 		}
 		//http://weixin.sogou.com/weixin?query=%E6%9D%B0%E5%9C%A3%E7%A7%BB%E6%B0%91&_sug_type_=&s_from=input&_sug_=n&type=2&page=5&ie=utf8
 	}
 
 	//专题
-	public function category($cate_url, $cate_id,$page)
+	public function category($cate_url, $cate_id, $page)
 	{
 		//curl获取不到
 		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
@@ -157,7 +157,7 @@ class craw
 		$content = $this->strr_replace($content);
 		//return $content;die;
 		//下载图片 body local_img
-		list($body, $local_img) = $this->download_img($content,$url);
+		list($body, $local_img) = $this->download_img($content, $url);
 		//$body = preg_replace('/[img]htt.*?[/img]/','',$body);
 		$title = explode('[/title]', $body)[0];
 		$title = str_replace('[title]', '', $title);
@@ -165,7 +165,7 @@ class craw
 		$title = str_replace('   ', '', $title);
 		try
 		{
-			$result = $this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
+			$this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
 		}
 		catch (PDOException $e)
 		{
@@ -179,7 +179,7 @@ class craw
 
 //下载图片
 
-	private function download_img($content,$article_url)
+	private function download_img($content, $article_url)
 	{
 		//匹配有效图片地址
 		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=]*(jpg|gif|png|jpeg|\?)/i', $content, $data);
@@ -199,22 +199,13 @@ class craw
 		$local_img = [];
 		foreach ($data[0] as $k => $v)
 		{
-			//$v图片的url   实例  =jpeg  =png
-			/*	if (strpos($v, '=') === false)
-				{
-					continue;
-				}*/
-			//$v = str_replace('[/img]', '', $v);
-			$filename = explode('=', $v);
-			if (isset($filename[1]) && in_array($filename[1], $this->ext))
-			{
-				$ext = $filename[1];
-			}
-			else
+			//匹配图片的后缀
+			$ext = $this->get_img_ext($v);
+			if (empty($ext))
 			{
 				continue;
 			}
-			$current = $this->getUrlContent($v,2,$article_url);
+			$current = $this->getUrlContent($v, 2, $article_url);
 			//新图片地址
 			list($dst_filename, $new_filename) = $this->md5_filename(md5($v), $ext);
 			//图片的字符串
@@ -230,6 +221,32 @@ class craw
 		];
 		///return $data;
 	}
+
+	/**
+	 * @param $url string 图片地址
+	 * @return mixed string 后缀
+	 */
+	private function get_img_ext($url)
+	{
+		$ext = '';
+		$header = get_headers($url, 1);
+		if (empty($header))
+		{
+			$filename = explode('=', $url);
+			if (isset($filename[1]) && in_array($filename[1], $this->ext))
+			{
+				$ext = $filename[1];
+			}
+		}
+		else
+		{
+			$ext = explode('/', $header['Content-Type'])[1];
+
+
+		}
+		return $ext;
+	}
+
 
 	//创建下载图片 目录
 	//img param $md5  ext后缀           return  /4d/45/dasfsdfsd5f5ds.jpg
@@ -278,7 +295,7 @@ class craw
 		//推广
 		$content = preg_replace('/阅读.*?/ism', "", $content);
 		//img
-		$content = preg_replace('/<img[^>]+src="([^"]+)"[^>]*>/i', "\n[img]$1[/img]\n", $content);
+		$content = preg_replace('/<img[^>]+data-src="([^"]+)"[^>]*>/i', "\n[img]$1[/img]\n", $content);
 		//return $content;
 		$content = preg_replace('/<p[^>]*?>/i', "\n\n", $content);
 		$content = preg_replace('/<([\/]?)b>/i', "[$1b]", $content);
@@ -334,7 +351,7 @@ class craw
 
 	}
 
-	private function getUrlContent($url, $type = 1,$article_url= '')
+	private function getUrlContent($url, $type = 1, $article_url = '')
 	{
 		if ($type == 1)
 		{
@@ -395,6 +412,7 @@ class craw
 			curl_setopt($ch, CURLOPT_REFERER, $article_url);   //构造来路
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 			@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);//https,false参数是规避证书的检查
 			if ($autoFollow)
 			{
 				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  //启动跳转链接
@@ -435,7 +453,7 @@ class craw
 
 	public function echo_log()
 	{
-		$id = $this->pdo->query("select id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
+		$id = $this->pdo->query("select id,cate_id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
 			'最一次插入的id' => $id['id'],
 			'属于的分类' => $id['cate_id'],

@@ -84,8 +84,8 @@ class craw
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//执行间隔的时间
-				echo "/n".' wait for 60 mins....';
-				sleep(3600);
+				echo ' wait for 30 mins....';
+				sleep(1800);
 			}
 		}
 
@@ -118,18 +118,20 @@ class craw
 	public function category($cate_url, $cate_id)
 	{
 		$content = $this->getUrlContent($cate_url, 2);
+		//打印ip是否被禁同了
+		//var_dump($content);die;
 		preg_match_all('/href=\".*?<img.*?<\/a>/', $content, $data);
 		if (empty($data[0]))
 		{
 			return [];
 		}
 
-		if($this->page_style == 1)
+		if ($this->page_style == 1)
 		{
 			$this->page_style_1($data[0], $cate_id, $cate_url);
 		}
 
-		if($this->page_style == 2)
+		if ($this->page_style == 2)
 		{
 			$this->page_style_2($data[0], $cate_id, $cate_url);
 		}
@@ -224,7 +226,7 @@ class craw
 	 * @param $url string 文章链接
 	 * @param $cate_id int 关键字的分类id
 	 * @param string $img_url 分类页面单张图片
-	 * @param string $cate_url  单张图片的链接
+	 * @param string $cate_url 单张图片的链接
 	 */
 	public function article($url, $cate_id, $img_url = '', $cate_url = '')
 	{
@@ -253,7 +255,7 @@ class craw
 		}
 
 		//爬过的文章
-		echo 'success----  ' . $url . '/n';
+		echo 'success----  ' . $url;
 	}
 
 
@@ -277,14 +279,9 @@ class craw
 		$local_img = [];
 		foreach ($data[0] as $k => $v)
 		{
-			//$v = str_replace('amp;', '', $v);
-			$filename = explode('=', $v);
-			//$current = file_get_contents($v);
-			if (isset($filename[1]) && in_array($filename[1], $this->ext))
-			{
-				$ext = $filename[1];
-			}
-			else
+			//获取图片后缀
+			$ext = $this->get_img_ext($v);
+			if (empty($ext))
 			{
 				continue;
 			}
@@ -308,13 +305,9 @@ class craw
 
 	private function download_one_img($url, $category_url)
 	{
-		$filename = explode('=', $url);
-		//$current = file_get_contents($v);
-		if (isset($filename[1]) && in_array($filename[1], $this->ext))
-		{
-			$ext = $filename[1];
-		}
-		else
+		//获取图片后缀
+		$ext = $this->get_img_ext($url);
+		if (empty($ext))
 		{
 			$ext = 'jpeg';
 		}
@@ -327,7 +320,33 @@ class craw
 		return $new_filename;
 	}
 
+	/**
+	 * @param $url string 图片地址
+	 * @return mixed string 后缀
+	 */
+	private function get_img_ext($url)
+	{
+		$ext = '';
+		$header = get_headers($url, 1);
+		if (empty($header))
+		{
+			$filename = explode('=', $url);
+			if (isset($filename[1]) && in_array($filename[1], $this->ext))
+			{
+				$ext = $filename[1];
+			}
+		}
+		else
+		{
+			$ext = explode('/', $header['Content-Type'])[1];
+
+
+		}
+		return $ext;
+	}
+
 	//创建目录和下载图片
+
 	/**
 	 * @param $md5 string  图片名称
 	 * @param $ext
@@ -382,8 +401,8 @@ class craw
 		$content = preg_replace('/meta_conten.*?rich_media_content/ism', "", $content);
 		//推广
 		$content = preg_replace('/阅读.*?/ism', "", $content);
-		//img
-		$content = preg_replace('/<img[^>]+src="([^"]+)"[^>]*>/i', "\n[img]$1[/img]\n", $content);
+		//img 注意文章图片的url
+		$content = preg_replace('/<img[^>]+data-src="([^"]+)"[^>]*>/i', "\n[img]$1[/img]\n", $content);
 		//return $content;
 		$content = preg_replace('/<p[^>]*?>/i', "\n\n", $content);
 		$content = preg_replace('/<([\/]?)b>/i', "[$1b]", $content);
@@ -485,6 +504,7 @@ class craw
 			curl_setopt($ch, CURLOPT_REFERER, $article_url);   //构造来路
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 			@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);//https,false参数是规避证书的检查
 			if ($autoFollow)
 			{
 				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  //启动跳转链接
@@ -533,7 +553,7 @@ class craw
 	 */
 	public function echo_log()
 	{
-		$id = $this->pdo->query("select id from star_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
+		$id = $this->pdo->query("select id,cate_id from star_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
 			'最一次插入的id' => $id['id'],
 			'属于的分类' => $id['cate_id'],
