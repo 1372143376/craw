@@ -276,7 +276,7 @@ class craw
 	private function download_img($content, $article_url)
 	{
 		//匹配有效图片地址
-		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\d|\?)/i', $content, $data);
+		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\d|\/|\\|\?)/i', $content, $data);
 		//preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?\d\W]*([\/img])$/i', $content, $data);
 		if (empty($data))
 		{
@@ -304,6 +304,7 @@ class craw
 			$local_img[] = $new_filename;
 			//替换原路径
 			$content = str_replace($v, $new_filename, $content);
+			$content = str_replace('?[/img]','[/img]',$content);
 			//保存图片
 			file_put_contents($dst_filename, $current);
 		}
@@ -351,7 +352,10 @@ class craw
 		else
 		{
 			$ext = explode('/', $header['Content-Type'])[1];
-
+			if (!in_array($ext, $this->ext) || empty($ext))
+			{
+				$ext = '';
+			}
 
 		}
 		return $ext;
