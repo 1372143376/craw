@@ -264,7 +264,7 @@ class craw
 	private function download_img($content, $article_url)
 	{
 		//匹配有效图片地址
-		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\?)/i', $content, $data);
+		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\d|\?)/i', $content, $data);
 		//preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?\d\W]*([\/img])$/i', $content, $data);
 		if (empty($data))
 		{

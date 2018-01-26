@@ -2,7 +2,40 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46fd8f46-5baa-4a3c-8867-1c9509fd4e1d" name="默认" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/craw_ys.php" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test.html" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/article.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/common.min.js(1).下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/common.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/datepicker.min.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/datepicker.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/event.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/form.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/jquery-1.11.0.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/juicer-min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(1)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(10)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(11)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(12)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(13)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(2)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(3)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(4)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(5)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(6)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(7)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(8)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/link(9)" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/log.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/m3.min.v.7.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/oIWsFtxJ5JJVvXbGqHjrXUc4BvP4" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/right.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/search.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/suggestion.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/tool.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/uigs.min.js.下载" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/weixin-public-new.min.css" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/test/test_files/wexinurlenc_sogou_profile.jsp" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -211,12 +244,12 @@
       <workItem from="1516361381147" duration="934000" />
       <workItem from="1516533270558" duration="2000" />
       <workItem from="1516533283802" duration="1862000" />
-      <workItem from="1516846877630" duration="14590000" />
+      <workItem from="1516846877630" duration="15155000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="132389000" />
+    <option name="totallyTimeSpent" value="132954000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
