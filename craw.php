@@ -155,6 +155,10 @@ class craw
 		//$this->down($file, $url);
 
 		$content = $this->getUrlContent($url, 1);
+		if (empty($content))
+		{
+			return [];
+		}
 		$content = $this->strr_replace($content);
 		//return $content;die;
 		//下载图片 body local_img

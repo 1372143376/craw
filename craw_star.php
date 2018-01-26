@@ -20,10 +20,17 @@ class craw
 
 	//页面类型，1 、img_md5 /// 保存单张图片 2、local_img ///json保存多张图片
 	private $page_style = 1;
+
 	//关键字搜索 专题页  加分页%u
 	private $key_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2&page=%u&ie=utf8';
 	//private $main_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2';
 
+	//关键词表的起始id
+	private $min_id = 1;
+	//关键词表的结束id
+	private $max_id = 81;
+
+	/////////以下基本不需要修改
 	//分页
 	private $start = 1;
 	private $end = 10;
@@ -68,7 +75,7 @@ class craw
 			echo $e->getMessage();
 		}
 
-		for ($id = 1; $id <= 81; $id++)
+		for ($id = $this->min_id; $id <= $this->max_id; $id++)
 		{
 			$results = $this->pdo->query("select * from star_cate  where id=$id and is_done = 0");
 			$row = $results->fetch(PDO::FETCH_ASSOC);
@@ -223,8 +230,8 @@ class craw
 	//文章页面，执行
 
 	/**
-	 * @param $url string 文章链接
-	 * @param $cate_id int 关键字的分类id
+	 * @param string $url  文章链接
+	 * @param int $cate_id  关键字的分类id
 	 * @param string $img_url 分类页面单张图片
 	 * @param string $cate_url 单张图片的链接
 	 */
@@ -233,6 +240,11 @@ class craw
 
 		$content = $this->getUrlContent($url, 1);
 		$content = $this->strr_replace($content);
+		if (empty($content))
+		{
+
+			return [];
+		}
 		//下载图片 body local_img
 		list($body, $local_img) = $this->download_img($content, $url);
 		//页面类型为1情况
