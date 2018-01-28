@@ -47,6 +47,7 @@ class craw
 	public function __construct()
 	{
 		set_time_limit(0);
+		date_default_timezone_set('PRC');
 		//链接数据库
 		$db_user = "root";
 		$db_pass = "";
@@ -82,9 +83,9 @@ class craw
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//间隔半小时
-				echo ' wait for 30 mins....';
+				echo ' wait for 30 mins....' . date('Y-m-d H:i:s', time());
 				//2.10
-				sleep(3000);
+				sleep(1800);
 			}
 		}
 	}
@@ -210,6 +211,7 @@ class craw
 			$ext = $this->get_img_ext($v);
 			if (empty($ext))
 			{
+				$content = str_replace($v, '', $content);
 				continue;
 			}
 			$current = $this->getUrlContent($v, 2, $article_url);
@@ -219,7 +221,7 @@ class craw
 			$local_img[] = $new_filename;
 			//替换原路径
 			$content = str_replace($v, $new_filename, $content);
-			$content = str_replace('?[/img]','[/img]',$content);
+			$content = str_replace('?[/img]', '[/img]', $content);
 			//保存图片
 			file_put_contents($dst_filename, $current);
 		}
@@ -236,14 +238,17 @@ class craw
 	 */
 	private function get_img_ext($url)
 	{
-		$ext = '';
 		$header = get_headers($url, 1);
-		if (empty($header))
+		if (empty($header['Content-Type']))
 		{
 			$filename = explode('=', $url);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
+			}
+			else
+			{
+				$ext = '';
 			}
 		}
 		else
@@ -443,6 +448,32 @@ class craw
 	}
 
 
+	/**
+	 * curl获取header信息
+	 * @param string $url url
+	 * @return array mixed
+	 *
+	 */
+	private function curl_get_header($url)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$header = $this->FormatHeader($url);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+//关闭https验证
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+//至关重要，CURLINFO_HEADER_OUT选项可以拿到请求头信息
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		$sContent = curl_exec($ch);
+//通过curl_getinfo()可以得到请求头的信息
+		$headers = curl_getinfo($ch);
+		curl_close($ch);
+		return $headers;
+	}
+
 	private function FormatHeader($url, $myIp = null, $xml = null)
 	{
 		// 解悉url
@@ -467,7 +498,7 @@ class craw
 		$id = $this->pdo->query("select id,cate_id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
 			'最一次插入的id' => $id['id'],
-			'属于的分类' => $id['cate_id'],
+			'当前执行的分类' => $id['cate_id'] + 1,
 		];
 	}
 }

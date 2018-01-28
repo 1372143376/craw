@@ -92,7 +92,7 @@ class craw
 				$this->run($row['name']);
 				//执行间隔的时间
 				echo ' wait for 30 mins....';
-				sleep(1800);
+				sleep(1500);
 			}
 		}
 
@@ -339,14 +339,18 @@ class craw
 	 */
 	private function get_img_ext($url)
 	{
-		$ext = '';
+
 		$header = get_headers($url, 1);
-		if (empty($header))
+		if (empty($header['Content-Type']))
 		{
 			$filename = explode('=', $url);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
+			}
+			else
+			{
+				$ext = '';
 			}
 		}
 		else

@@ -13,10 +13,10 @@ class craw
 {
 
 	//数据库存图片地址的根路径   /uploads/
-	private $baseDir = '/test/';
+	private $baseDir = '/uploads/';
 
 	//本地保存图片绝对路劲
-	private $img_Dir = 'D:/test/page/test/';
+	private $img_Dir = 'D:/test/page/star/';
 
 	//抓取页面类型，1 、img_md5 /// 保存单张图片 2、local_img ///json保存多张图片
 	private $page_style = 1;
@@ -47,7 +47,8 @@ class craw
 		'png',
 		'jpeg',
 		'gif',
-		'webp'
+		'webp',
+		'bmp'
 	];
 
 	//实例pdo模型
@@ -93,7 +94,7 @@ class craw
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//执行间隔的时间
-				echo ' wait for 30 mins....';
+				echo ' wait for 30 mins....'. date('Y-m-d H:i:s', time());
 				sleep(1800);
 			}
 		}
@@ -264,7 +265,7 @@ class craw
 		}
 
 		//爬过的文章
-		echo 'success----  ' . $url . '\n';
+		echo 'success----  ' . $url."\n";
 	}
 
 
@@ -273,7 +274,7 @@ class craw
 	private function download_img($content, $article_url)
 	{
 		//匹配有效图片地址
-		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\?)/i', $content, $data);
+		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\d|\w|\/|\\|\?)/i', $content, $data);
 		//preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?\d\W]*([\/img])$/i', $content, $data);
 		if (empty($data))
 		{
@@ -288,6 +289,7 @@ class craw
 		$local_img = [];
 		foreach ($data[0] as $k => $v)
 		{
+			$v = str_replace('[/img', '', $v);
 			//获取图片后缀
 			$ext = $this->get_img_ext($v);
 			if (empty($ext))
@@ -443,6 +445,32 @@ class craw
 		return $content;
 	}
 
+
+	/**
+	 * curl获取header信息
+	 * @param string $url url
+	 * @return array mixed
+	 *
+	 */
+	private function curl_get_header($url)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$header = $this->FormatHeader($url);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+//关闭https验证
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+//至关重要，CURLINFO_HEADER_OUT选项可以拿到请求头信息
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		$sContent = curl_exec($ch);
+//通过curl_getinfo()可以得到请求头的信息
+		$headers = curl_getinfo($ch);
+		curl_close($ch);
+		return $headers;
+	}
 
 	//curl 下载
 
