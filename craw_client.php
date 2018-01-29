@@ -94,7 +94,7 @@ class craw
 				$this->id = $row['id'];
 				$this->run($row['name']);
 				//执行间隔的时间
-				echo ' wait for 30 mins....'. date('Y-m-d H:i:s', time());
+				echo ' wait for 30 mins....finished id = '.$id.' [[['. date('Y-m-d H:i:s', time());
 				sleep(1800);
 			}
 		}
@@ -593,7 +593,7 @@ class craw
 		$id = $this->pdo->query("select id,cate_id from $this->article_table order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
 			'最一次插入的id' => $id['id'],
-			'属于的分类' => $id['cate_id'],
+			'当前执行的分类' => $id['cate_id'] + 1,
 		];
 	}
 }
