@@ -253,6 +253,7 @@ class craw
 
 		$title = explode('[/title]', $body)[0];
 		$title = str_replace('[title]', '', $title);
+		$title = str_replace("\r\n", '', $title);
 		$title = str_replace('  ', '', $title);
 		$title = str_replace('   ', '', $title);
 		try
