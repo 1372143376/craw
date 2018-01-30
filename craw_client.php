@@ -80,6 +80,8 @@ class craw
 		//设置专题的数量  从1---81
 		for ($id = 1; $id <= 81; $id++)
 		{
+			//再需要加判断爬完分类的文章数是否大于一定的数目，如果小于的话，删除当前分类的，并把当前分类的is_done更新为0，重新抓
+			/////
 			$results = $this->pdo->query("select * from $this->cate_table  where id=$id and is_done = 0");
 			$row = $results->fetch(PDO::FETCH_ASSOC);
 			$this->pdo->exec("update $this->cate_table set is_done = 1 where id = $id");
