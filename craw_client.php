@@ -7,7 +7,7 @@ $craw = new craw();
 echo 'success....all';
 die;
 
-
+//先根据对应的公众号搜索,搜不到，根据公众号名字查找
 //////////////////////////////
 class craw
 {

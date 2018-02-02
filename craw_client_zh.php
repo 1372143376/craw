@@ -1,35 +1,47 @@
 <?php
 set_time_limit(0);
-
 $craw = new craw();
+//$oo = $craw->category('D:\test\page\test\test.html', '', '');
+//var_dump($oo);
+//die;
+echo 'success....all';
 die;
 
-
+//先根据对应的公众号搜索,搜不到，根据公众号名字查找
 //////////////////////////////
 class craw
 {
 
-	//根路径
-	private $baseDir = 'D:/test/page/';
+	//数据库存图片地址的根路径   /uploads/
+	private $baseDir = '/uploads/';
 
-	//图片目录
-	private $img_Dir = 'D:/test/page/uploads/';
+	//本地保存图片绝对路劲
+	private $img_Dir = 'D:/test/page/zhonghe/';
 
-	//关键字
-	//private $key = '杰圣移民';
+	//抓取页面类型，1 、img_md5 /// 保存单张图片 2、local_img ///json保存多张图片
+	private $page_style = 1;
 
-	//关键字搜索 专题页  加分页%u
+
+	///dsn
+	private $dsn = 'mysql:dbname=test;host=127.0.0.1';
+
+	//专题表name
+	private $cate_table = 'zhonghe_cate';
+
+	//文章表name
+	private $article_table = 'zhonghe_article';
+
+	//关键字搜索链接 专题页  加分页%ucaipu33
 	private $key_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2&page=%u&ie=utf8';
-	//private $main_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2';
 
-	//分页
+	//分页 开始值  结束值
 	private $start = 1;
 	private $end = 10;
 
-	//专题的id //36
+	//抓取专题的id
 	private $id;
 
-	//图片后缀
+	//下载图片的后缀的范围
 	private $ext = [
 		'jpg',
 		'png',
@@ -39,28 +51,25 @@ class craw
 		'bmp'
 	];
 
+	//实例pdo模型
 	private $pdo;
 
-	//文章test
-	//private $url = 'https://mp.weixin.qq.com/s?__biz=MjM5MTUzOTAxNQ==&mid=2653255939&idx=1&sn=d92408bcc065e47c96d0d4236caf68ba&chksm=bd65d32b8a125a3d3e28e4fe113e0406b24d167ebb1371bb4d5c9d7d4467e2193b4211b4c7a0&scene=21';
 
 	public function __construct()
 	{
 		set_time_limit(0);
-		date_default_timezone_set('PRC');
 		//链接数据库
 		$db_user = "root";
 		$db_pass = "";
 		try
 		{
 			header("Content-Type: text/html; charset=utf-8");
-			$dsn = 'mysql:dbname=test;host=127.0.0.1';
 			$setting = array(
 				PDO::ATTR_PERSISTENT => true,
 				PDO::ATTR_ERRMODE => 2,
 				PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
 			);
-			$this->pdo = new PDO($dsn, $db_user, $db_pass, $setting);
+			$this->pdo = new PDO($this->dsn, $db_user, $db_pass, $setting);
 		}
 		catch
 		(PDOException $e)
@@ -68,11 +77,14 @@ class craw
 			echo $e->getMessage();
 		}
 
-		for ($id = 1; $id <= 39; $id++)
+		//设置专题的数量  从1---81
+		for ($id = 1; $id <= 118; $id++)
 		{
-			$results = $this->pdo->query("select * from dede_quanquan  where id=$id and is_done = 0");
+			//再需要加判断爬完分类的文章数是否大于一定的数目，如果小于的话，删除当前分类的，并把当前分类的is_done更新为0，重新抓
+			/////
+			$results = $this->pdo->query("select * from $this->cate_table  where id=$id and is_done = 0");
 			$row = $results->fetch(PDO::FETCH_ASSOC);
-			$this->pdo->exec("update dede_quanquan set is_done = 1 where id = $id");
+			$this->pdo->exec("update $this->cate_table set is_done = 1 where id = $id");
 			if (empty($row))
 			{
 				continue;
@@ -80,60 +92,133 @@ class craw
 			else
 			{
 				print_r($this->echo_log());
+
 				$this->id = $row['id'];
 				$this->run($row['name']);
-				//间隔半小时
-				echo ' wait for 30 mins....' . date('Y-m-d H:i:s', time());
-				//2.10
+				//执行间隔的时间
+				echo ' wait for 30 mins....finished id = ' . $id . ' [[[' . date('Y-m-d H:i:s', time());
 				sleep(1800);
 			}
 		}
+
 	}
 
+	//启动
+
+	/**
+	 * @param $name string  搜索的关键字
+	 */
 	public function run($name)
 	{
 		set_time_limit(0);
 		//run
-		$this->index($name);
-
-	}
-
-	//专题页面
-
-	public function index($key)
-	{
 		//分页
 		for ($i = $this->start; $i <= $this->end; $i++)
 		{
-			$cate_url = sprintf($this->key_url, $key, $i);
-			$this->category($cate_url, $this->id, $i);
+			$cate_url = sprintf($this->key_url, $name, $i);
+			$this->category($cate_url, $this->id);
 		}
-		//http://weixin.sogou.com/weixin?query=%E6%9D%B0%E5%9C%A3%E7%A7%BB%E6%B0%91&_sug_type_=&s_from=input&_sug_=n&type=2&page=5&ie=utf8
 	}
 
-	//专题
-	public function category($cate_url, $cate_id, $page)
+	//分析分页专题
+
+	/**
+	 * @param $cate_url string 专题页面链接
+	 * @param $cate_id    int 关键词的分类id
+	 * @return array
+	 */
+	public function category($cate_url, $cate_id)
 	{
-		//curl获取不到
-		///^((ht|f)tps?):\/\/[\w\-]+(\.[\w\-]+)+([\w\-\.,@?^=%&:\/~\+#]*[\w\-\@?^=%&\/~\+#])?$/
 		$content = $this->getUrlContent($cate_url, 2);
-		//$content = file_get_contents('D:\test\page\html\1.html');
-		//匹配文章链接http://mp.weixin.qq.com/s?
-		///   /http:\/\/mp.weixin.qq.com\/s\?src=([\w\-]+(\.[\w\-]+)*\/)*[\w\-]+(\.[\w\-]+)*\/?(\?([\w\-\.,@?^=%&:\/~\+#]*)+)?/i
-		preg_match_all('/href=\".*?\"/', $content, $data);
+		//打印ip是否被禁同了
+		//var_dump($content);die;
+		preg_match_all('/href=\".*?<img.*?<\/a>/', $content, $data);
 		if (empty($data[0]))
 		{
 			return [];
 		}
+
+		if ($this->page_style == 1)
+		{
+			$this->page_style_1($data[0], $cate_id, $cate_url);
+		}
+
+		if ($this->page_style == 2)
+		{
+			$this->page_style_2($data[0], $cate_id, $cate_url);
+		}
+
+	}
+
+	//针对不同页面,不同采集方式
+
+	/**
+	 * @param array $data 匹配的链接
+	 * @param int $cate_id 关键词的分类id
+	 * @param string $cate_url 专题页面的地址
+	 */
+	private function page_style_1($data, $cate_id, $cate_url)
+	{
 		$new_data = [];
-		foreach ($data[0] as $k => $val)
+		$herf = [];
+
+		//排除三张首图的
+		$n = 0;
+		foreach ($data as $k => $val)
+		{
+			if (strpos($val, 'span') > 0)
+			{
+				$n++;
+				if ($n > 1)
+				{
+					continue;
+				}
+			}
+			else
+			{
+				$n = 0;
+			}
+			$new_data[$k] = $val;
+		}
+
+		foreach ($new_data as $k => $val)
 		{
 			//筛选
 			if (strpos($val, 'http://mp.weixin.qq.com/s?src=') === false)
 			{
 				continue;
 			}
-			//"href="http://mp.weixin.qq.com/s?src=3&amp;timestamp=1515926017&amp;ver=1&amp;signature=Zcr9FdALzIG3s1fDzbptLuFW6r*tauYy5LsWsijQ-9IqHX5zbBkGnnlDGw3-0maZX778L0gTJNnOLMetRLOcBWrL1ZCvXSdWsybH7EyULsVaRTPEdqs-bBOw9ip7RltDQIhSZWeEr4txBRvioZXN7A==""
+			preg_match('/href=\".*?\"/', $val, $herf['a']);
+			preg_match('/src=\".*?\"/', $val, $herf['img']);
+			$herf['a'] = str_replace('href="', '', $herf['a']);
+			//分析链接 有加盐  amp;
+			$herf['a'] = str_replace('amp;', '', $herf['a']);
+			$herf['a'] = rtrim($herf['a'][0], '"');
+			//首图地址
+			$herf['img'] = str_replace('src="', '', $herf['img']);
+			//分析链接 有加盐  amp;
+			$herf['img'] = str_replace('amp;', '', $herf['img']);
+			$herf['img'] = rtrim($herf['img'][0], '"');
+
+			$this->article($herf['a'], $cate_id, $herf['img'], $cate_url);
+		}
+	}
+
+	/**
+	 * @param array $data 匹配的链接
+	 * @param int $cate_id 关键词的分类id
+	 * @param string $cate_url 文章页面的地址
+	 */
+	private function page_style_2($data, $cate_id, $cate_url)
+	{
+		$new_data = [];
+		foreach ($data as $k => $val)
+		{
+			//筛选
+			if (strpos($val, 'http://mp.weixin.qq.com/s?src=') === false)
+			{
+				continue;
+			}
 			$val = str_replace('href="', '', $val);
 			//分析链接 有加盐  amp;
 			$val = str_replace('amp;', '', $val);
@@ -141,39 +226,53 @@ class craw
 			$new_data[$k] = rtrim($val, '"');
 		}
 		$new_data = array_unique($new_data);
+
 		foreach ($new_data as $article_url)
 		{
 			$this->article($article_url, $cate_id);
 		}
-
 	}
-
 	//文章页面，执行
-	//param 文章的链接  所属专题id
-	public function article($url, $cate_id)
+
+	/**
+	 * @param $url string 文章链接
+	 * @param $cate_id int 关键字的分类id
+	 * @param string $img_url 分类页面单张图片
+	 * @param string $cate_url 单张图片的链接
+	 */
+	public function article($url, $cate_id, $img_url = '', $cate_url = '')
 	{
 
-		//test下载页面
-		//$file = $this->baseDir . 'html/' . rand(0,999) . '.html';
-		//$this->down($file, $url);
-
 		$content = $this->getUrlContent($url, 1);
-		if (empty($content))
-		{
-			return [];
-		}
 		$content = $this->strr_replace($content);
-		//return $content;die;
 		//下载图片 body local_img
 		list($body, $local_img) = $this->download_img($content, $url);
-		//$body = preg_replace('/[img]htt.*?[/img]/','',$body);
+		//页面类型为1情况
+		if ($this->page_style == 1)
+		{
+			$local_img = $this->download_one_img($img_url, $cate_url);
+		}
+
 		$title = explode('[/title]', $body)[0];
 		$title = str_replace('[title]', '', $title);
+		$title = str_replace("\r\n", '', $title);
 		$title = str_replace('  ', '', $title);
 		$title = str_replace('   ', '', $title);
+/*		$is_exist = $this->pdo->query("select id from $this->article_table where title = '$title'")->fetch(PDO::FETCH_ASSOC);
+		if (empty($is_exist))
+		{
+			$this->pdo->exec("insert into $this->article_table (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
+			//爬过的文章
+			echo 'success----  ' . $url . "\n";
+		}
+		else
+		{
+			//爬过的文章
+			echo $is_exist['id'].'success----  ' . $url . "\n";
+		}*/
 		try
 		{
-			$this->pdo->exec("insert into dede_article (cate_id,title,body,local_img) values ($cate_id,'$title','$body','$local_img')");
+			$this->pdo->exec("insert into $this->article_table (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
 		}
 		catch (PDOException $e)
 		{
@@ -182,36 +281,35 @@ class craw
 
 		//爬过的文章
 		echo 'success----  ' . $url . "\n";
+
 	}
 
 
-//下载图片
+//下载文章页面图片
 
 	private function download_img($content, $article_url)
 	{
 		//匹配有效图片地址
-		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=]*(jpg|gif|png|jpeg|\d|\/|\\|\?)/i', $content, $data);
+		preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?]*(jpg|gif|png|jpeg|\d|\w|\/|\\|\?)/i', $content, $data);
 		//preg_match_all('/((http|https):\/\/)+(\w+\.)+(.*)+(\w+)[\w\/\.\-\=\?\d\W]*([\/img])$/i', $content, $data);
 		if (empty($data))
 		{
 			return [];
 		}
 		//图片保存路径
-		$img_Dir = $this->baseDir . 'uploads/';
 		if (!file_exists($this->img_Dir))
 		{
-			mkdir($img_Dir, 0777, true);
+			mkdir($this->img_Dir, 0777, true);
 		}
-
 		//local_img 字段 json
 		$local_img = [];
 		foreach ($data[0] as $k => $v)
 		{
-			//匹配图片的后缀
+			$v = str_replace('[/img', '', $v);
+			//获取图片后缀
 			$ext = $this->get_img_ext($v);
 			if (empty($ext))
 			{
-				$content = str_replace($v, '', $content);
 				continue;
 			}
 			$current = $this->getUrlContent($v, 2, $article_url);
@@ -221,7 +319,6 @@ class craw
 			$local_img[] = $new_filename;
 			//替换原路径
 			$content = str_replace($v, $new_filename, $content);
-			$content = str_replace('?[/img]', '[/img]', $content);
 			//保存图片
 			file_put_contents($dst_filename, $current);
 		}
@@ -229,7 +326,25 @@ class craw
 			$content,
 			json_encode($local_img)
 		];
-		///return $data;
+	}
+
+	//专题页面，下载单张图片
+
+	private function download_one_img($url, $category_url)
+	{
+		//获取图片后缀
+		$ext = $this->get_img_ext($url);
+		if (empty($ext))
+		{
+			$ext = 'jpeg';
+		}
+		//新图片地址
+		list($dst_filename, $new_filename) = $this->md5_filename(md5($url), $ext);
+		$current = $this->getUrlContent($url, 2, $category_url);
+		//保存图片
+		file_put_contents($dst_filename, $current);
+		//返回单张图片新地址
+		return $new_filename;
 	}
 
 	/**
@@ -238,34 +353,32 @@ class craw
 	 */
 	private function get_img_ext($url)
 	{
+		$ext = '';
 		$header = get_headers($url, 1);
-		if (empty($header['Content-Type']))
+		if (empty($header))
 		{
 			$filename = explode('=', $url);
 			if (isset($filename[1]) && in_array($filename[1], $this->ext))
 			{
 				$ext = $filename[1];
 			}
-			else
-			{
-				$ext = '';
-			}
 		}
 		else
 		{
 			$ext = explode('/', $header['Content-Type'])[1];
-			if (!in_array($ext, $this->ext) || empty($ext))
-			{
-				$ext = '';
-			}
+
 
 		}
 		return $ext;
 	}
 
+	//创建目录和下载图片
 
-	//创建下载图片 目录
-	//img param $md5  ext后缀           return  /4d/45/dasfsdfsd5f5ds.jpg
+	/**
+	 * @param $md5 string  图片名称
+	 * @param $ext
+	 * @return array
+	 */
 	private function md5_filename($md5, $ext)
 	{
 		$dir1 = $md5{0} . $md5{17};
@@ -288,7 +401,7 @@ class craw
 		}
 		$dst_filename = $small_dir . '/' . $md5 . '.' . $ext;
 		//替换地址
-		$new_filename = '/uploads/' . $dir1 . '/' . $dir2 . '/' . $md5 . '.' . $ext;
+		$new_filename = $this->baseDir . $dir1 . '/' . $dir2 . '/' . $md5 . '.' . $ext;
 		return [
 			$dst_filename,
 			$new_filename
@@ -296,6 +409,11 @@ class craw
 	}
 
 	//过滤字符串
+
+	/**
+	 * @param $content string 需要过滤的字符串
+	 * @return mixed|string
+	 */
 	private function strr_replace($content)
 	{
 		$content = rtrim($content[0], '<script');
@@ -310,7 +428,7 @@ class craw
 		$content = preg_replace('/meta_conten.*?rich_media_content/ism', "", $content);
 		//推广
 		$content = preg_replace('/阅读.*?/ism', "", $content);
-		//img
+		//img 注意文章图片的url
 		$content = preg_replace('/<img[^>]+data-src="([^"]+)"[^>]*>/i', "\n[img]$1[/img]\n", $content);
 		//return $content;
 		$content = preg_replace('/<p[^>]*?>/i', "\n\n", $content);
@@ -343,31 +461,42 @@ class craw
 		return $content;
 	}
 
-	//测试下载html文件
-	private function down($file, $url)
+
+	/**
+	 * curl获取header信息
+	 * @param string $url url
+	 * @return array mixed
+	 *
+	 */
+	private function curl_get_header($url)
 	{
-		$html_url = $this->baseDir . 'html';
-		//html保存路径
-		if (!file_exists($html_url))
-		{
-			mkdir($html_url, 0777, true);
-		}
-
-		if (!file_exists($file))
-		{
-			$content = $this->getUrlContent($url);
-			$len = mb_strlen($content);
-			if ($len > 0)
-			{
-				file_put_contents($file, $content);
-			}
-			echo $file . "\n";
-			echo sprintf("%s(%d)\n", $url, $len) . "\n";
-		}
-
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		$header = $this->FormatHeader($url);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+//关闭https验证
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+//至关重要，CURLINFO_HEADER_OUT选项可以拿到请求头信息
+		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		$sContent = curl_exec($ch);
+//通过curl_getinfo()可以得到请求头的信息
+		$headers = curl_getinfo($ch);
+		curl_close($ch);
+		return $headers;
 	}
 
-	private function getUrlContent($url, $type = 1, $article_url = '')
+	//curl 下载
+
+	/**
+	 * @param $url    string 链接地址
+	 * @param int $type 1、是栏目页面的分割  2、针对图片或文章的来路，百度未收录，从原文链接下载
+	 * @param string $article_url 当type选择2,填写来路页面的链接
+	 * @return mixed
+	 */
+	private function getUrlContent($url, $type = 1, $article_url = 'www.baidu.com')
 	{
 		if ($type == 1)
 		{
@@ -449,31 +578,11 @@ class craw
 
 
 	/**
-	 * curl获取header信息
-	 * @param string $url url
-	 * @return array mixed
-	 *
+	 * @param $url
+	 * @param null $myIp
+	 * @param null $xml
+	 * @return array  分析header头
 	 */
-	private function curl_get_header($url)
-	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		$header = $this->FormatHeader($url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-//关闭https验证
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-//至关重要，CURLINFO_HEADER_OUT选项可以拿到请求头信息
-		curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		$sContent = curl_exec($ch);
-//通过curl_getinfo()可以得到请求头的信息
-		$headers = curl_getinfo($ch);
-		curl_close($ch);
-		return $headers;
-	}
-
 	private function FormatHeader($url, $myIp = null, $xml = null)
 	{
 		// 解悉url
@@ -492,10 +601,12 @@ class craw
 		return $header;
 	}
 
-
+	/**
+	 * @return array 返回上次爬完 ，插表的记录
+	 */
 	public function echo_log()
 	{
-		$id = $this->pdo->query("select id,cate_id from dede_article order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
+		$id = $this->pdo->query("select id,cate_id from $this->article_table order by id desc limit 1")->fetch(PDO::FETCH_ASSOC);
 		return [
 			'最一次插入的id' => $id['id'],
 			'当前执行的分类' => $id['cate_id'] + 1,

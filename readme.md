@@ -3,7 +3,8 @@
 php爬虫  
 爬网站的文章、标题、图片
 
-只针对特定网站（微信搜狐）
+只针对特定网站（微信搜狐）自己学习技术，不做商用
+
 （http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2）
 
 链接中第一个%是关键字、第二个是分页页数  用printf替换
