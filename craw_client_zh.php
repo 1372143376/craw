@@ -31,7 +31,7 @@ class craw
 	//文章表name
 	private $article_table = 'zhonghe_article';
 
-	//关键字搜索链接 专题页  加分页%ucaipu33
+	//关键字搜索链接 专题页  加分页%ucaipu33  kkp485
 	private $key_url = 'http://weixin.sogou.com/weixin?query=%s&_sug_type_=&s_from=input&_sug_=n&type=2&page=%u&ie=utf8';
 
 	//分页 开始值  结束值
@@ -77,12 +77,42 @@ class craw
 			echo $e->getMessage();
 		}
 
-		//设置专题的数量  从1---81
+		//开始
+		$this->setting_run();
+
+		//处理一些不完整数据
+		//$this->deal_data();
+
+	}
+
+	//处理数据自定义逻辑
+	public function deal_data()
+	{
+		$results = $this->pdo->query("select * from $this->article_table  where title = 'Array' and body != '0'")->fetchAll();
+		foreach ($results as $val)
+		{
+			if (strpos($val['body'],'[title]'))
+			{
+				$title = explode('[/title]',$val['body'])[0];
+				$title = str_replace('[title]','',$title);
+				$title = str_replace("\r\n", '', $title);
+				$title = str_replace('  ', '', $title);
+				$title = str_replace('   ', '', $title);
+				//update
+				$id = $val['id'];
+				$this->pdo->exec("update $this->article_table set title = '$title' where id = $id ");
+			}
+		}
+	}
+
+	//启动
+	public function setting_run()
+	{
 		for ($id = 1; $id <= 118; $id++)
 		{
 			//再需要加判断爬完分类的文章数是否大于一定的数目，如果小于的话，删除当前分类的，并把当前分类的is_done更新为0，重新抓
 			/////
-			$results = $this->pdo->query("select * from $this->cate_table  where id=$id and is_done = 0");
+			$results = $this->pdo->query("select * from $this->cate_table  where id=$id and is_done = 0 and domain_id != 2");
 			$row = $results->fetch(PDO::FETCH_ASSOC);
 			$this->pdo->exec("update $this->cate_table set is_done = 1 where id = $id");
 			if (empty($row))
@@ -99,12 +129,9 @@ class craw
 				echo ' wait for 30 mins....finished id = ' . $id . ' [[[' . date('Y-m-d H:i:s', time());
 				sleep(1800);
 			}
+
 		}
-
 	}
-
-	//启动
-
 	/**
 	 * @param $name string  搜索的关键字
 	 */
@@ -258,29 +285,25 @@ class craw
 		$title = str_replace("\r\n", '', $title);
 		$title = str_replace('  ', '', $title);
 		$title = str_replace('   ', '', $title);
-/*		$is_exist = $this->pdo->query("select id from $this->article_table where title = '$title'")->fetch(PDO::FETCH_ASSOC);
-		if (empty($is_exist))
+		if (empty($title))
 		{
-			$this->pdo->exec("insert into $this->article_table (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
-			//爬过的文章
-			echo 'success----  ' . $url . "\n";
+			echo 'fail----- 失效页面'. "\n";
 		}
 		else
 		{
+			try
+			{
+				$this->pdo->exec("insert into $this->article_table (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
+			}
+			catch (PDOException $e)
+			{
+				echo 'Connection failed: ' . $e->getMessage();
+			}
+
 			//爬过的文章
-			echo $is_exist['id'].'success----  ' . $url . "\n";
-		}*/
-		try
-		{
-			$this->pdo->exec("insert into $this->article_table (cate_id,title,body,img_md5) values ($cate_id,'$title','$body','$local_img')");
-		}
-		catch (PDOException $e)
-		{
-			echo 'Connection failed: ' . $e->getMessage();
+			echo 'success----  ' . $url .$title. "\n";
 		}
 
-		//爬过的文章
-		echo 'success----  ' . $url . "\n";
 
 	}
 
